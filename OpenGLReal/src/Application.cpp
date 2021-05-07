@@ -1,28 +1,44 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
+
+
+
+static std::string ParseShader(const std::string& filePath)
+{
+    std::ifstream stream(filePath);
+    std::string line;
+    std::string shader = "";
+
+    while (getline(stream, line))
+    {
+        shader += line;
+        shader += "\n";
+    }
+    return shader; 
+}
 
 static unsigned int CompileShader(const std::string& shader, unsigned int type)
 {
-    unsigned int id = glCreateShader(type);
-    const char* src = shader.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
+	unsigned int id = glCreateShader(type);
+	const char* src = shader.c_str();
+	glShaderSource(id, 1, &src, nullptr);
+	glCompileShader(id);
 
-    int result; 
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    char infoLog[512];
+	int result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	char infoLog[512];
 
-    if (result == GL_FALSE)
-    {
-        glGetShaderInfoLog(id, 512, NULL, infoLog);
-        std::cout << "Shader compilation failed" << infoLog << std::endl; 
-    }
-  
+	if (result == GL_FALSE)
+	{
+		glGetShaderInfoLog(id, 512, NULL, infoLog);
+		std::cout << "Shader compilation failed" << infoLog << std::endl;
+	}
 
-    return id; 
+	return id;
 }
 
 static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
@@ -81,21 +97,8 @@ int main(void)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-    std::string vertexShader =
-		"#version 330 core\n"
-		"layout (location = 0) in vec4 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = aPos;\n"
-		"}\0";
-
-    std::string fragmentShader =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"   FragColor = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
-		"}\n\0";
+    std::string vertexShader = ParseShader("res/shaders/vertex.shader");
+    std::string fragmentShader = ParseShader("res/shaders/fragment.shader");
 
 
     unsigned int shader = CreateShader(vertexShader, fragmentShader);
@@ -115,7 +118,7 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
-
+    glDeleteProgram(shader);
     glfwTerminate();
     return 0;
 }
