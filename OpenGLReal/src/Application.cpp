@@ -1,9 +1,37 @@
+
+
+
+
+
+
+
+
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+#define ASSERT(x) if (x) __debugbreak();
+#define GLLog(x) ClearError();\
+                 x;\
+                 ASSERT(CheckError())
+
+
+static void ClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static bool CheckError()
+{
+    if (glGetError() == GL_NO_ERROR)
+    {
+        return false;
+    }
+    return true; 
+}
 
 static std::string ParseShader(const std::string& filePath)
 {
@@ -121,11 +149,17 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
+
         glClear(GL_COLOR_BUFFER_BIT);
 
+		float time = glfwGetTime();
+		float blueVal = sin((time) / 2.0f) + 0.2f;
+		int location = glGetUniformLocation(shader, "u_Color");
+		glUniform4f(location, 0.5f, 0.0f, blueVal, 1.0f);
+      
         //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+        GLLog(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
