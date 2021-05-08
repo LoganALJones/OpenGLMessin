@@ -1,17 +1,12 @@
 
-
-
-
-
-
-
-
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 #define ASSERT(x) if (x) __debugbreak();
 #define GLLog(x) ClearError();\
@@ -125,23 +120,17 @@ int main(void)
 		2,3,0
 	};
 	unsigned int VBO, IBO, VAO;
-	//Gen buffers and vertex array 
+	//Gen vertex array
 	GLLog(glGenVertexArrays(1, &VAO));
-	GLLog(glGenBuffers(1, &VBO));
-	GLLog(glGenBuffers(1, &IBO));
 
 	// Binding vertex array will 'save' upcoming 
 	// bind calls and vertex attrib pointer calls 
 	GLLog(glBindVertexArray(VAO));
 
 
-	// bind position buffer 
-	GLLog(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLLog(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
+	VertexBuffer vb(positions, sizeof(positions));
+	IndexBuffer ib(indices, 6);
 
-	//bind index buffer 
-	GLLog(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO));
-	GLLog(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
 
 	//position attrib
 	GLLog(glEnableVertexAttribArray(0));
